@@ -23,6 +23,7 @@
 
 ################################################################################
 # Imports
+from re import S
 import streamlit as st
 from dataclasses import dataclass
 from typing import Any, List
@@ -50,7 +51,13 @@ import hashlib
 # Create a Record Data Class that consists of the `sender`, `receiver`, and
 # `amount` attributes
 # YOUR CODE HERE
-
+@dataclass
+class Record:
+    # Define the parameters that the Record class will hold    
+    
+    amount: float
+    sender: str
+    receiver: str
 
 ################################################################################
 # Step 2:
@@ -68,8 +75,7 @@ class Block:
 
     # @TODO
     # Rename the `data` attribute to `record`, and set the data type to `Record`
-    data: Any
-
+    record: Record
     creator_id: int
     prev_hash: str = "0"
     timestamp: str = datetime.datetime.utcnow().strftime("%H:%M:%S")
@@ -120,6 +126,9 @@ class PyChain:
         block = self.proof_of_work(candidate_block)
         self.chain += [block]
 
+
+
+
     def is_valid(self):
         block_hash = self.chain[0].hash_block()
 
@@ -141,10 +150,11 @@ class PyChain:
 
 @st.cache(allow_output_mutation=True)
 def setup():
-    print("Initializing Chain")
-    return PyChain([Block("Genesis", 0)])
-
-
+      print("Initializing Chain") 
+      record = Record(amount =100, sender = 'sarah', receiver = 'molly')
+      block = Block(record=record, creator_id=42, prev_hash='0')
+      return PyChain(chain=[block])
+    
 st.markdown("# PyChain")
 st.markdown("## Store a Transaction Record in the PyChain")
 
@@ -166,19 +176,22 @@ pychain = setup()
 
 # @TODO:
 # Delete the `input_data` variable from the Streamlit interface.
-input_data = st.text_input("Block Data")
+#input_data = st.text_input("Block Data")
 
 # @TODO:
 # Add an input area where you can get a value for `sender` from the user.
 # YOUR CODE HERE
+sender = st.text_input("Sender Name")
 
 # @TODO:
 # Add an input area where you can get a value for `receiver` from the user.
 # YOUR CODE HERE
+receiver = st.text_input("Receiver Name")
 
 # @TODO:
 # Add an input area where you can get a value for `amount` from the user.
 # YOUR CODE HERE
+amount = st.text_input("Amount Transacted")
 
 if st.button("Add Block"):
     prev_block = pychain.chain[-1]
@@ -189,7 +202,7 @@ if st.button("Add Block"):
     # which is set equal to a `Record` that contains the `sender`, `receiver`,
     # and `amount` values
     new_block = Block(
-        data=input_data,
+        record=Record(amount, sender, receiver),
         creator_id=42,
         prev_hash=prev_block_hash
     )
